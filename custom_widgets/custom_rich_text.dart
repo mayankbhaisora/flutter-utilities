@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 
 /// [CustomRichText] is a Flutter widget that takes a text string
 /// and an array of special words. It renders the text with special styling
@@ -18,45 +18,43 @@ import 'package:flutter/gestures.dart';
 ///
 class CustomRichText extends StatelessWidget {
   final void Function(int)? onTapSpecialWord;
+
   /// Main text shown by the widget.
   final String text;
+
   /// These strings are searched in given [text] and [specialStyle] is applied.
   final List<String> specialWords;
-  final TextStyle defaultStyle;
-  final TextStyle specialStyle;
+  final TextStyle? defaultStyle;
+  final TextStyle? specialStyle;
   final TextAlign textAlign;
-
-  static const TextStyle _defaultStyle = TextStyle(
-    fontFamily: 'DM Sans',
-    fontSize: 14,
-    color: Color(0xFF6D4D7E),
-  );
-  static const TextStyle _specialStyle = TextStyle(
-    fontFamily: 'DM Sans',
-    fontWeight: FontWeight.w600,
-    color: Color(0xFFB93072),
-  );
 
   const CustomRichText({
     super.key,
     required this.text,
     required this.specialWords,
-    this.defaultStyle = _defaultStyle,
-    this.specialStyle = _specialStyle,
+    this.defaultStyle,
+    this.specialStyle,
     this.textAlign = TextAlign.start,
     this.onTapSpecialWord,
   });
 
   @override
   Widget build(BuildContext context) {
+    TextStyle? finalDefaultStyle =
+        Theme.of(context).textTheme.bodyLarge?.merge(defaultStyle);
     return RichText(
       textAlign: textAlign,
       text: TextSpan(
-        style: defaultStyle,
+        style: finalDefaultStyle,
         children: _buildTextSpanChildren(
           text: text,
           specialWords: specialWords,
-          specialStyle: specialStyle,
+          specialStyle: finalDefaultStyle
+              ?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFB93072),
+              )
+              .merge(specialStyle),
         ),
       ),
     );
@@ -65,7 +63,7 @@ class CustomRichText extends StatelessWidget {
   List<InlineSpan> _buildTextSpanChildren({
     required String text,
     required List<String> specialWords,
-    required TextStyle specialStyle,
+    required TextStyle? specialStyle,
   }) {
     List<InlineSpan> children = [];
 
